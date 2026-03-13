@@ -82,7 +82,13 @@ app.get("/companies", async (req, res) => {
   const limit = Number(req.query.limit) || 20
   const sortBy = req.query.sortBy || "security"
 
-  const companies = await Company.find().sort(sortBy).limit(limit)
+  const filter = {}
+
+  if (req.query.sector) {
+    filter.gicsSector = req.query.sector
+  }
+
+  const companies = await Company.find(filter).sort(sortBy).limit(limit)
   res.json(companies)
 })
 
