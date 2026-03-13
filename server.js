@@ -1,6 +1,7 @@
 import cors from "cors"
 import express from "express"
 import mongoose from "mongoose"
+import data from "./data/us500.json" with { type: "json" };
 
 // If you're using one of our datasets, uncomment the appropriate import below
 // to get started!
@@ -26,7 +27,27 @@ app.use(express.json())
 
 // Start defining your routes here
 app.get("/", (req, res) => {
-  res.send("Hello Technigo!")
+  res.send("Hello Technigo!");
+});
+
+
+//Defining routes
+app.get("/companies", (req, res) => {
+  res.json(data)
+})
+
+//Add endpoint for companies
+app.get("/companies/:symbol", (req, res) => {
+  const company = data.find(
+    (item) => item.Symbol.toLowerCase() === req.params.symbol.toLowerCase()
+  )
+
+  if (!company) {
+    res.status(404).json({ message: "Company not found" })
+    return
+  }
+
+  res.json(company)
 })
 
 // Start the server
