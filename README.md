@@ -1,24 +1,46 @@
 # First API
 
-Replace this readme with your own information about the project. You can include things like:
+# US500 API
 
-- Brief description of the assignment
-- How you approached the task, what tools and techniques you used, and how you planned it
-- If you had more time, what would be next?
-- How to run the project locally
+A RESTful API built with Express and Mongoose using data about 500 US companies.
 
-## View it live
-Every project should be deployed somewhere. Be sure to include the link to the deployed project so that the viewer can click around and see what it's all about.
+## Features
 
+- Get all companies
+- Get one company by symbol
+- Filter companies by sector
+- Limit and sort results with query parameters
+- Data is seeded into MongoDB
 
-## Getting Started with the Project
+## Endpoints
 
-### Dependency Installation & Startup Development Server
+- `/`
+- `/companies`
+- `/companies/:symbol`
+- `/companies/sector/:sector`
 
-Once cloned, navigate to the project's root directory and this project uses npm (Node Package Manager) to manage its dependencies.
+## Query params
 
-The command below is a combination of installing dependencies, opening up the project on VS Code and it will run a development server on your terminal.
+For `/companies`:
+
+- `limit`
+- `sortBy`
+
+Example:
+
+`/companies?limit=10&sortBy=symbol`
+
+## Tech stack
+
+- Express
+- Mongoose
+- MongoDB
+
+## How to run locally
 
 ```bash
-npm i && code . && npm run dev
-```
+npm install
+npm run dev
+
+
+## View it live

@@ -15,6 +15,36 @@ const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/project-first-api
 mongoose.connect(mongoUrl)
 mongoose.Promise = Promise
 
+const Company = mongoose.model("Company", {
+  symbol: String,
+  security: String,
+  gicsSector: String,
+  gicsSubIndustry: String,
+  headquartersLocation: String,
+  dateAdded: String,
+  cik: Number,
+  founded: String
+})
+if (process.env.RESET_DB) {
+  const seedDatabase = async () => {
+    await Company.deleteMany()
+
+    data.forEach((item) => {
+      new Company({
+        symbol: item.Symbol,
+        security: item.Security,
+        gicsSector: item["GICS Sector"],
+        gicsSubIndustry: item["GICS Sub-Industry"],
+        headquartersLocation: item["Headquarters Location"],
+        dateAdded: item["Date added"],
+        cik: item.CIK,
+        founded: item.Founded
+      }).save()
+
+    })
+  }
+  seedDatabase()
+}
 // Defines the port the app will run on. Defaults to 8080, but can be overridden
 // when starting the server. Example command to overwrite PORT env variable value:
 // PORT=9000 npm start
@@ -32,15 +62,15 @@ app.get("/", (req, res) => {
     endpoints: [
       {
         endpoint: "/companies",
-        description: "Returns all companies"
+        description: "Get all companies"
       },
       {
         endpoint: "/companies/:symbol",
-        description: "Returns one company by stock symbol"
+        description: "Get one company by stock symbol"
       },
       {
         endpoint: "/companies/sector/:sector",
-        description: "Returns all companies in a specific sector"
+        description: "Get all companies in a specific sector"
       }
     ]
   })
@@ -48,15 +78,19 @@ app.get("/", (req, res) => {
 
 
 //Defining routes
-app.get("/companies", (req, res) => {
-  res.json(data)
+app.get("/companies", async (req, res) => {
+  const limit = Number(req.query.limit) || 20
+  const sortBy = req.query.sortBy || "security"
+
+  const companies = await Company.find().sort(sortBy).limit(limit)
+  res.json(companies)
 })
 
 //Add endpoint for companies
-app.get("/companies/:symbol", (req, res) => {
-  const company = data.find(
-    (item) => item.Symbol.toLowerCase() === req.params.symbol.toLowerCase()
-  )
+app.get("/companies/:symbol", async (req, res) => {
+  const company = await Company.findOne({
+    symbol: req.params.symbol.toUpperCase()
+  })
 
   if (!company) {
     res.status(404).json({ message: "Company not found" })
@@ -67,13 +101,11 @@ app.get("/companies/:symbol", (req, res) => {
 })
 
 //Add endpoint for sector
-app.get("/companies/sector/:sector", (req, res) => {
-  const sector = req.params.sector.toLowerCase(
-  )
+app.get("/companies/sector/:sector", async (req, res) => {
 
-  const filteredCompanies = data.filter(
-    (item) => item["GICS Sector"].toLowerCase() === sector
-  )
+  const filteredCompanies = await Company.find({
+    gicsSector: req.params.sector
+  })
 
   if (!sector) {
     res.status(404).json({ message: "Sector not found" })
