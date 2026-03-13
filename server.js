@@ -27,7 +27,23 @@ app.use(express.json())
 
 // Start defining your routes here
 app.get("/", (req, res) => {
-  res.send("Hello Technigo!");
+  res.json({
+    message: "Welcome to the US500 API",
+    endpoints: [
+      {
+        endpoint: "/companies",
+        description: "Returns all companies"
+      },
+      {
+        endpoint: "/companies/:symbol",
+        description: "Returns one company by stock symbol"
+      },
+      {
+        endpoint: "/companies/sector/:sector",
+        description: "Returns all companies in a specific sector"
+      }
+    ]
+  })
 });
 
 
@@ -48,6 +64,23 @@ app.get("/companies/:symbol", (req, res) => {
   }
 
   res.json(company)
+})
+
+//Add endpoint for sector
+app.get("/companies/sector/:sector", (req, res) => {
+  const sector = req.params.sector.toLowerCase(
+  )
+
+  const filteredCompanies = data.filter(
+    (item) => item["GICS Sector"].toLowerCase() === sector
+  )
+
+  if (!sector) {
+    res.status(404).json({ message: "Sector not found" })
+    return
+  }
+
+  res.json(filteredCompanies)
 })
 
 // Start the server
